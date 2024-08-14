@@ -19,7 +19,7 @@ function App() {
   return (
     <>
         <Routes>
-           
+
             <Route path="/" element={<MainLayout />} >
               <Route index element={<DisplayHome />}  />
               <Route path='/album/:albumId' element={<DisplayAlbum />} />

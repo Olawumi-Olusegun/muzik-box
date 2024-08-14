@@ -14,9 +14,9 @@ const AddSongForm = () => {
   const [album, setAlbum] = useState("none")
 
 
-  const { data: albums, refetch, isRefetching } = useQuery({
-		queryKey: ["listAlbum"],
-		queryFn: async () =>  await apiClient.fetchAlbums(),
+  const { data: albums, refetch } = useQuery({
+		queryKey: ["fetchAllAlbum"],
+		queryFn: async () =>  await apiClient.fetchAllAlbum(),
 	});
 
   const { mutate: addSongMutation, isPending: isLoading } = useMutation({

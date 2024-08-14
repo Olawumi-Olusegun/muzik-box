@@ -34,8 +34,8 @@ const DisplayAlbum = () => {
       <img src={albumData?.image} alt={albumData.name} className='rounded-md pointer-events-none' />
       <div className="flex flex-col">
         <p className="">Playlist</p>
-        <h2 className='text-5xl font-bold mb-4 md:text-7xl '>{albumData.name}</h2>
-        <h4 className="">{albumData.desc}</h4>
+        <h2 className='text-5xl font-bold mb-4 md:text-7xl line-clamp-2'>{albumData.name}</h2>
+        <h4 className="line-clamp-3">{albumData.desc}</h4>
         <div className="mt-1 flex items-center gap-1.5">
           <img src={assets.spotify_logo} alt="spotify_logo" className='inline-block w-5' />
           <b>Spotify</b>

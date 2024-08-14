@@ -15,6 +15,7 @@ const ListSongs = () => {
     queryFn: async () => await apiClient.fetchSongs(),
   });
 
+
   const { mutate: deleteSongMutation, isPending: isDeleting } = useMutation({
     mutationKey: ["deleteSong"],
     mutationFn: async () => await apiClient.deleteSong(songId),
@@ -50,12 +51,13 @@ const ListSongs = () => {
           <b>Duration</b>
           <b>Action</b>
         </div>
+
         {
-          songs.length > 0 && songs.map((song) => (
+          songs?.length > 0 && songs.map((song) => (
             <div key={song._id} className="grid grid-cols-[1fr_1fr_1fr] sm:grid-cols-[0.5fr_1fr_2fr_1fr_0.5fr] items-center gap-2.5 p-3 border border-gray-300 text-sm ">
               <img src={song.image} alt={song.name} className='w-12 h-12 rounded pointer-events-none' />
               <p className="truncate">{song.name}</p>
-              <p className="truncate">{song.album}</p>
+              <p className="truncate">{song.album?.name}</p>
               <p className="truncate">{song.duration}</p>
               <button disabled={isDeleting} onClick={() => handleDeleteSong(song._id)} className="w-fit disabled:cursor-not-allowed truncate p-2 rounded hover:bg-gray-200 duration-300 ">
                 { isDeleting && song._id === songId
@@ -63,9 +65,6 @@ const ListSongs = () => {
                   : <X className='w-4 h-4 ' />
                 }
               </button>
-
-
-
             </div>
           ))
         }

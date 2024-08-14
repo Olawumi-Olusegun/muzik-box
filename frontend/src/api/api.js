@@ -47,6 +47,15 @@ export const addAlbum = async (formData) => {
     }
 }
 
+export const fetchAllAlbum = async () => {
+    try {
+        const { data } = await axios.get(`${baseUrl}/album/all`)
+        return data?.data;
+    } catch (error) {
+        throw error
+    }
+}
+
 export const fetchAlbums = async () => {
     try {
         const { data } = await axios.get(`${baseUrl}/album`)
@@ -94,6 +103,7 @@ const apiClient = {
     deleteAlbum,
     fetchAlbum,
     fetchSong,
+    fetchAllAlbum,
 }
 
 export default apiClient;

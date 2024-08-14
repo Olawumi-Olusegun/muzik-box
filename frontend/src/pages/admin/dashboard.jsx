@@ -2,7 +2,7 @@ import React from 'react'
 
 const Dashboard = () => {
   return (
-    <div className=''>
+    <div className='p-5'>
       Dashboard Default Page
     </div>
   )
