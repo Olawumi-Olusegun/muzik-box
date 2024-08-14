@@ -1,5 +1,6 @@
 import cloudinary from "../middlewares/cloudinary.js";
 import AlbumModel from "../models/album.model.js";
+import SongModel from "../models/song.model.js";
 import { uploadFile } from "../utils/uploadFile.js";
 
 
@@ -10,14 +11,26 @@ export const addAlbum = async (req, res) => {
 
     try {
 
-        const uploadResponse = await uploadFile(imageFile.path, {
+        if(!imageFile) {
+            return res.status(400).json({ success: false, message: "Album image is required"}) 
+        }
+
+        const uploadResponse = await uploadFile(imageFile?.path, {
             resource_type: "image",
             transformation: [
-                { width: 500, height: 500, crop: "limit" }
+                {
+                    width: 500,
+                    height: 500,
+                    crop: "limit"
+                }
               ]
         });
 
-        const newAlbum = new AlbumModel({name, desc, bgColor, image: uploadResponse.secure_url });
+        if(!uploadResponse || !uploadResponse?.secure_url) {
+            return res.status(400).json({ success: false, message: "Album image not uploaded"}) 
+        }
+
+        const newAlbum = new AlbumModel({ name, desc, bgColor, image: uploadResponse.secure_url });
 
         const savedAlbum = await newAlbum.save();
 
@@ -36,7 +49,11 @@ export const addAlbum = async (req, res) => {
 export const listAlbum = async (req, res) => {
     try {
 
-        const albums = await AlbumModel.find({});
+        const albums = await AlbumModel.find({ albumSongs: { $ne: [] } })
+                        .populate({
+                            path: "albumSongs",
+                            match: { $ne: [] }, 
+                        })
 
         if(!albums) {
             return res.status(404).json({ success: false, message: "No album found"})
@@ -55,9 +72,34 @@ export const listAlbum = async (req, res) => {
     }
 }
 
+export const fetchAlbum = async (req, res) => {
+
+    const { albumId } = req.params;
+
+    try {
+
+        const album = await AlbumModel.findById(albumId)
+                    .populate({ path: "albumSongs", match: { $ne: [] }, });
+        
+        if(!album) {
+            return res.status(404).json({ success: false, message: "Album not found"})
+        }
+
+ 
+        const response = {
+            data: album,
+            success: true, 
+            message: "Single album"
+        }
+        return res.status(200).json(response);
+    } catch (error) {
+        return res.status(500).json({ success: false, message: "Something went wrong"})
+    }
+}
+
 export const updateAlbum = async (req, res) => {
     try {
-        
+
     } catch (error) {
         
     }

@@ -1,16 +1,24 @@
 import { createContext, useContext, useEffect, useRef, useState } from "react";
 import apiClient from "../api/api";
-import { toast } from "react-toastify";
+import { useQuery } from "@tanstack/react-query";
 
 
 const PlayerContext = createContext();
 
 const PlayerContextProvider = ({children}) => {
 
-    const [songsData, setSongData] = useState([])
-    const [albumsData, setAlbumsData] = useState([])
+    const { data: albumsRespon, isLoading: isAlbumLoading } = useQuery({
+        queryKey: ['listAlbum'],
+        queryFn: async () => await apiClient.getAlbums()
+    });
 
-    const [track, setTrack] = useState(songsData[0]);
+    const { data: songsRespon, isLoading: isSongLoading, refetch } = useQuery({
+        queryKey: ['listSongs'],
+        queryFn: async () => await apiClient.fetchSongs(),
+    });
+
+
+    const [track, setTrack] = useState(null);
     const [playerStatus, setPlayerStatus] = useState(false);
     const [time, setTime] = useState({
         currentTime: {
@@ -39,23 +47,34 @@ const PlayerContextProvider = ({children}) => {
 
     const playWithId = async (songId) => {
         if(songId) {
-            await setTrack(songsData[songId])
-            await audioRef.current?.play();
-            setPlayerStatus(true)
+            const findSong = songsRespon.find((item) => item._id === songId);
+            if(findSong) {
+                await setTrack(findSong)
+                await audioRef.current?.play();
+                setPlayerStatus(true)
+            }
         }
     }
 
     const previous = async () => {
-        if(track.id > 0) {
-            await setTrack(songsData[track.id - 1])
+        if(track._id) {
+            const songIndex = songsRespon.findIndex((item) => item._id === track._id);
+            if(songIndex === 0) return;
+            await setTrack(songsRespon[songIndex - 1])
             await audioRef.current?.play();
             setPlayerStatus(true)
+
         }
     }
 
     const next = async () => {
-        if(track.id < songsData.length - 1) {
-            await setTrack(songsData[track.id + 1])
+
+        if(!track?._id) return;
+
+        const songIndex = songsRespon.findIndex((item) => item._id === track._id);
+
+        if((songsRespon && songsRespon.length - 1) > songIndex) {
+            await setTrack(songsRespon[songIndex + 1])
             await audioRef.current?.play();
             setPlayerStatus(true)
         }
@@ -63,27 +82,11 @@ const PlayerContextProvider = ({children}) => {
 
     const seekSong = async (event) => {
         event.preventDefault();
-        
         if(audioRef.current && seekBg.current) {
             audioRef.current.currentTime = ((event.nativeEvent.offsetX / seekBg.current.offsetWidth) * audioRef.current.duration)
         }
     }
 
-
-    const getSongAndAlbumData = async () => {
-        try {
-            const songPromise = apiClient.fetchSongs();
-            const albumPromise = apiClient.getAlbums();
-            const [songData, albumData] = await Promise.all([songPromise, albumPromise]);
-            setSongData(songData)
-            setAlbumsData(albumData)
-            setTrack(songData[0])
-        } catch (error) {
-            toast.error(error?.message)
-        } 
-    }
-
-    
     const contextValue = {
         audioRef,
         seekBar,
@@ -100,15 +103,19 @@ const PlayerContextProvider = ({children}) => {
         previous,
         playWithId,
         seekSong,
-        songsData,
-        albumsData,
+        songsData: songsRespon || [],
+        albumsData: albumsRespon?.data || [],
+        songsRespon,
+        albumsRespon,
+        isAlbumLoading,
+        isSongLoading,
     }
 
     useEffect(() => {
-
-        if(audioRef.current && seekBar.current) {
+        
+        if(audioRef.current && seekBar) {
             audioRef.current.ontimeupdate = () => {
-                seekBar.current.style.width = (Math.floor(audioRef.current.currentTime/audioRef.current.duration * 100)) + "%";
+                seekBar.current.style.width = (Math.floor(audioRef.current?.currentTime/audioRef.current?.duration * 100)) + "%";
                 setTime({
                     currentTime: {
                         seconds: Math.floor(audioRef.current?.currentTime % 60),
@@ -122,11 +129,13 @@ const PlayerContextProvider = ({children}) => {
             }
         }
 
-    }, [audioRef])
+    }, [audioRef, seekBar])
 
     useEffect(() => {
-        getSongAndAlbumData()
-    }, [])
+        if (songsRespon && songsRespon.length > 0) {
+            setTrack(songsRespon[0] ?? null);
+        }
+    }, [songsRespon])
 
     return <PlayerContext.Provider value={contextValue}>
         {children}

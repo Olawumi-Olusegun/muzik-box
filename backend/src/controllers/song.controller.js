@@ -1,4 +1,5 @@
 import cloudinary from "../middlewares/cloudinary.js";
+import AlbumModel from "../models/album.model.js";
 import SongModel from "../models/song.model.js";
 import { uploadFile } from "../utils/uploadFile.js";
 
@@ -6,7 +7,7 @@ import { uploadFile } from "../utils/uploadFile.js";
 
 export const addSong = async (req, res) => {
 
-    const { name, desc, album = "new album" } = req.body;
+    const { name, desc, album } = req.body;
 
     let imageFile;
     let audioFile;
@@ -17,6 +18,12 @@ export const addSong = async (req, res) => {
     }
 
     try {
+
+        const albumExist = await AlbumModel.findById(album);
+
+        if(!albumExist) {
+            return res.status(400).json({ success: false, message: "Album not found"})
+        }
 
         const audioUploader = await uploadFile(audioFile.path, { resource_type: "video" });
         const imageUploader = await uploadFile(imageFile.path, {
@@ -37,14 +44,19 @@ export const addSong = async (req, res) => {
 
         const savedSong = await newSong.save();
 
+        if(!savedSong) {
+            return res.status(400).json({ success: false, message: "Unable to create song"})
+        }
+
+        await AlbumModel.findByIdAndUpdate(album, {
+            $addToSet: {
+                albumSongs: savedSong.id 
+            }});
+        
         const response = {
             data: savedSong,
             success: true, 
             message: "Song created successfully"
-        }
-
-        if(!savedSong) {
-            return res.status(400).json({ success: false, message: "Unable to create song"})
         }
 
         return res.status(201).json(response);
@@ -58,11 +70,16 @@ export const addSong = async (req, res) => {
 export const listSongs = async (req, res) => {
     try {
 
-        const songs = await SongModel.find({});
+        const songs = await SongModel.find({}).populate({
+            path: "album",
+            select: "name albumSongs"
+        });
 
         if(!songs) {
             return res.status(400).json({ success: false, message: "No song"})
         }
+
+        // console.log(JSON.stringify(songs.albumSongs))
 
         const response = {
             data: songs,

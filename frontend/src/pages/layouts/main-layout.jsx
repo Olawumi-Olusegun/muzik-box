@@ -3,31 +3,32 @@ import { Outlet, useLocation } from 'react-router-dom'
 import Sidebar from '../../components/sidebar'
 import Player from '../../components/player'
 import { usePlayerContext } from '../../context/PlayerContext'
-import { albumsData } from '../../assets/assets'
 import Navbar from '../../components/navbar'
 
 const MainLayout = () => {
 
-  const { audioRef, track } = usePlayerContext();
+  const { audioRef, track, albumsData,  } = usePlayerContext();
 
   const location = useLocation();
+
   const displayRef = useRef(null);
 
   const isAlbum = location.pathname.includes("album");
 
-  // const albumId = isAlbum ? location.pathname.slice(-1) : "";
-  const albumId = isAlbum ? location.pathname.split("/") : "";
+  const albumId = isAlbum ? location.pathname.split("/").pop() : "";
 
-  const bgColor = albumsData[Number(albumId)].bgColor;
-  
+  const findIndex = albumsData.findIndex((item) => item._id === albumId);
+
+  const bgColor = albumsData[findIndex]?.bgColor;
 
   useEffect(() => {
     if(isAlbum && displayRef.current) {
       displayRef.current.style.background = `linear-gradient(${bgColor},#121212)`;
-    }else {
+    } else {
       displayRef.current.style.background = `#121212`;
     }
-  }, [location])
+  }, [location]);
+  
 
   return (
     <>
@@ -40,7 +41,7 @@ const MainLayout = () => {
             <Outlet />
           </main>
           {track ? <Player /> : null }
-        <audio src={track ? track.file : ""} ref={audioRef} preload="auto"></audio>
+        <audio src={track ? track.audio : ""} ref={audioRef} preload="auto"></audio>
     </div>
     </>
   )

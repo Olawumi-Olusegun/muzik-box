@@ -89,7 +89,7 @@ const AddSongForm = () => {
                 <option value="none">None</option>
                 {
                   albums?.length > 0 && albums.map((album) => (
-                    <option key={album._id} value={album.name}>{album.name}</option>
+                    <option key={album._id} value={album._id}>{album.name}</option>
                   ))
                 }
               </select>
