@@ -1,6 +1,7 @@
 import axios from "axios"
 
 const baseUrl = "/api/v1";
+axios.defaults.withCredentials = true
 
 export const addSong = async (formData) => {
     try {
@@ -93,6 +94,51 @@ export const getAlbums = async () => {
     }
 }
 
+// auth => signIn, signUp, signOut
+
+export const signIn = async (formData) => {
+    try {
+        const { data } = await axios.post(`${baseUrl}/auth/signin`, formData)
+        return data?.data;
+    } catch (error) {
+        throw error
+    }
+}
+
+export const signUp = async (formData) => {
+    try {
+        const { data } = await axios.post(`${baseUrl}/auth/signup`, formData)
+   
+        return data?.data;
+    } catch (error) {
+        // console.log("API ERROR", error)
+        throw error
+    }
+}
+
+export const signOut = async () => {
+    try {
+        const { data } = await axios.post(`${baseUrl}/auth/signout`)
+        return data?.data;
+    } catch (error) {
+        throw error
+    }
+}
+
+
+
+export const getUserData = async () => {
+    try {
+        const { data } = await axios.get(`${baseUrl}/auth/me`, {
+            method: "GET",
+        })
+        return data?.data;
+    } catch (error) {
+        console.log(error)
+        throw error
+    }
+}
+
 const apiClient = {
     addSong,
     fetchSongs,
@@ -104,6 +150,10 @@ const apiClient = {
     fetchAlbum,
     fetchSong,
     fetchAllAlbum,
+    signIn,
+    signUp,
+    signOut,
+    getUserData
 }
 
 export default apiClient;

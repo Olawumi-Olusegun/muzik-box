@@ -5,8 +5,9 @@ import Player from '../../components/player'
 import { usePlayerContext } from '../../context/PlayerContext'
 import Navbar from '../../components/navbar'
 
-const MainLayout = () => {
 
+const MainLayout = () => {
+  
   const { audioRef, track, albumsData,  } = usePlayerContext();
 
   const location = useLocation();
@@ -21,6 +22,8 @@ const MainLayout = () => {
 
   const bgColor = albumsData[findIndex]?.bgColor;
 
+
+
   useEffect(() => {
     if(isAlbum && displayRef.current) {
       displayRef.current.style.background = `linear-gradient(${bgColor},#121212)`;
@@ -28,7 +31,7 @@ const MainLayout = () => {
       displayRef.current.style.background = `#121212`;
     }
   }, [location]);
-  
+
 
   return (
     <>

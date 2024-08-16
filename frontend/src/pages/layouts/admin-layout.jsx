@@ -1,20 +1,18 @@
 import React from 'react'
-import { Outlet } from 'react-router-dom'
-import Sidebar from '../admin/_components/sidebar'
-import Navbar from '../admin/_components/navbar'
+import { Navigate, Outlet } from 'react-router-dom'
+import useAuth from '../../hooks/useAuth'
+import Loading from '../../components/common/Loading'
+
 
 const AdminLayout = () => {
-  return (
-    <div className='flex'>
-      <aside className="min-h-screen">
-        <Sidebar />
-      </aside>
-      <main className="flex-1">
-        <Navbar />
-        <Outlet />
-      </main>
-    </div>
-  )
+
+  const { data: userData, isLoading,  } = useAuth();
+
+  if(isLoading) {
+    return <Loading />
+  }
+
+  return userData && userData?.isAdmin ? <Outlet /> : <Navigate to={"/"} />
 }
 
 export default AdminLayout

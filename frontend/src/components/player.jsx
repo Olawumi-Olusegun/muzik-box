@@ -6,6 +6,8 @@ const Player = () => {
 
   const { seekBar, seekBg, seekSong, play, pause, playerStatus, track, time, previous, next, } = usePlayerContext();
 
+  
+
   return (
     <div className='fixed z-50 bottom-0 left-0 right-0 w-full min-h-[10%] bg-black/90 flex justify-between items-center text-white/90 px-4 '>
       <div className="hidden lg:flex items-center gap-4 bg-black/90">

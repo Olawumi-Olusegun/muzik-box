@@ -6,11 +6,11 @@ const Sidebar = () => {
   return (
     <div className='w-full p-2 hidden flex-col lg:flex  gap-2 text-white/90'>
       <div className="bg-[#121212] h-[15%] rounded flex flex-col justify-around ">
-        <Link to={"/"} className="flex items-center gap-3 pl-8 cursor-pointer hover:bg-[#202020] py-2 duration-300 ">
+        <Link to={"/"} className="flex items-center gap-3 pl-3 cursor-pointer hover:bg-[#202020] py-2 duration-300 ">
           <img src={assets.home_icon} alt="home-icon" className='w-6' />
           <p className='font-bold'>Home</p>
         </Link>
-        <div className="flex items-center gap-3 pl-8 cursor-pointer hover:bg-[#202020] py-2 duration-300 ">
+        <div className="flex items-center gap-3 pl-3 cursor-pointer hover:bg-[#202020] py-2 duration-300 ">
           <img src={assets.search_icon} alt="search_icon" className='w-6' />
           <p className='font-bold'>Search</p>
         </div>

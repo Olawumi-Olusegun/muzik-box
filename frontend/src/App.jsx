@@ -12,6 +12,7 @@ import ListSongs from "./pages/admin/list-songs";
 import ListAlbums from "./pages/admin/list-albums";
 import AdminLayout from "./pages/layouts/admin-layout";
 import AddAlbum from "./pages/admin/add-album";
+import ProtectedRoute from "./pages/layouts/protected-layout";
 
 
 function App() {
@@ -20,10 +21,12 @@ function App() {
     <>
         <Routes>
 
-            <Route path="/" element={<MainLayout />} >
-              <Route index element={<DisplayHome />}  />
-              <Route path='/album/:albumId' element={<DisplayAlbum />} />
-              <Route path='/song/:songId' element={<DisplaySong />} />
+            <Route element={<ProtectedRoute />}>
+              <Route path="/" element={<MainLayout />} >
+                <Route index element={<DisplayHome />}  />
+                <Route path='/album/:albumId' element={<DisplayAlbum />} />
+                <Route path='/song/:songId' element={<DisplaySong />} />
+              </Route>
             </Route>
 
             <Route path="/admin" element={<AdminLayout />}>

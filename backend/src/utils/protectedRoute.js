@@ -1,10 +1,11 @@
 import jwt from "jsonwebtoken";
 import UserModel from "../models/user.model.js";
+import constants from "../config/index.js";
 
 
 export const protectRoute = async (req, res, next) => {
 
-    const token = req.cookie["accessToken"];
+    const token = req.cookies["accessToken"]
 
     try {
 
@@ -12,7 +13,7 @@ export const protectRoute = async (req, res, next) => {
             return res.status(400).json({ message: "Unauthorized: No token"})
         }
 
-        const decoded = jwt.verify(token, "", token);
+        const decoded = jwt.verify(token, constants.ACCESSTOKEN_SECRET, token);
 
         if(!decoded || !decoded?.userId) {
             return res.status(400).json({ message: "Unauthorized: Invalid token"})
@@ -55,7 +56,7 @@ export const refreshToken = async (req, res, next) => {
             return res.status(400).json({ message: "Unauthorized: No token"})
         }
 
-        const decoded = jwt.verify(token, "", token);
+        const decoded = jwt.verify(token, constants.REFRESHTOKEN_SECRET, token);
 
         if(!decoded || !decoded?.userId) {
             return res.status(400).json({ message: "Unauthorized: Invalid token"})

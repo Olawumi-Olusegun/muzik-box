@@ -4,8 +4,8 @@ import { protectRoute, refreshToken } from "../utils/protectedRoute.js";
 
 const router = express.Router();
 
-router.post("/signin", signup);
-router.post("/signup", signin);
+router.post("/signin", signin);
+router.post("/signup", signup);
 router.post("/signout", signout);
 router.get("/me", protectRoute, getUser);
 router.get("/refresh", refreshToken, refresh);

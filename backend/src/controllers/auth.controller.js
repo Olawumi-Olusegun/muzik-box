@@ -14,15 +14,17 @@ export const signin = async (req, res) => {
             return res.status(404).json({ message: "User not found" })
         }
 
-        const isPasswordValid = userExist.isValidPassword(password);
+        const isPasswordValid = await userExist.isValidPassword(password);
+
+        console.log(isPasswordValid)
 
         if(!isPasswordValid) {
             return res.status(400).json({ message: "Invalid credentials" })
         }
 
         // generate token
-        const accessToken = generateToken(userExist.id, constants.ACCESSTOKEN_SECRET, expiresIn = "30m")
-        const refreshToken = generateToken(userExist.id, constants.REFRESHTOKEN_SECRET, expiresIn = "30d")
+        const accessToken = generateToken(userExist.id, constants.ACCESSTOKEN_SECRET, "30m")
+        const refreshToken = generateToken(userExist.id, constants.REFRESHTOKEN_SECRET, "30d")
 
         // set accessToken cookies
         res.cookie("accessToken", accessToken, {
@@ -54,14 +56,8 @@ export const signup = async (req, res) => {
 
         const userExist = await UserModel.findOne({ email });
 
-        if(!userExist) {
-            return res.status(404).json({ message: "User not found" })
-        }
-
-        const isPasswordValid = userExist.isValidPassword(password);
-
-        if(!isPasswordValid) {
-            return res.status(400).json({ message: "Invalid credentials" }) 
+        if(userExist) {
+            return res.status(400).json({ message: "User already exist" })
         }
 
         const newUser = new UserModel({fullName, email, password })
@@ -73,8 +69,8 @@ export const signup = async (req, res) => {
         }
 
         // generate token
-        const accessToken = generateToken(userExist.id, constants.ACCESSTOKEN_SECRET, expiresIn = "30m")
-        const refreshToken = generateToken(userExist.id, constants.REFRESHTOKEN_SECRET, expiresIn = "30d")
+        const accessToken = generateToken(savedUser.id, constants.ACCESSTOKEN_SECRET, "30m")
+        const refreshToken = generateToken(savedUser.id, constants.REFRESHTOKEN_SECRET, "30d" )
 
         // set accessToken cookies
         res.cookie("accessToken", accessToken, {
@@ -96,6 +92,8 @@ export const signup = async (req, res) => {
         console.log("[SIGN UP]", error)
         return res.status(500).json({ message: "Something went wrong" })
     }
+
+
 }
 
 export const signout = async (req, res) => {
