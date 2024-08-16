@@ -46,6 +46,28 @@ export const addAlbum = async (req, res) => {
     }
 }
 
+export const fetchAllAlbum = async (req, res) => {
+    try {
+
+        const albums = await AlbumModel.find({}).select("name")
+
+        if(!albums) {
+            return res.status(404).json({ success: false, message: "No album found"})
+        }
+
+        const response = {
+            data: albums,
+            success: true, 
+            message: "All albums"
+        }
+
+        return res.status(200).json(response);
+
+    } catch (error) {
+        return res.status(500).json({ success: false, message: "Something went wrong"})
+    }
+}
+
 export const listAlbum = async (req, res) => {
     try {
 

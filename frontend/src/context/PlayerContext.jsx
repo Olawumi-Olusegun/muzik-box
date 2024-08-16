@@ -1,6 +1,6 @@
 import { createContext, useContext, useEffect, useRef, useState } from "react";
-import apiClient from "../api/api";
 import { useQuery } from "@tanstack/react-query";
+import apiClient from "../api/api";
 
 
 const PlayerContext = createContext();
@@ -49,7 +49,7 @@ const PlayerContextProvider = ({children}) => {
         if(songId) {
             const findSong = songsRespon.find((item) => item._id === songId);
             if(findSong) {
-                await setTrack(findSong)
+                await setTrack(findSong);
                 await audioRef.current?.play();
                 setPlayerStatus(true)
             }
@@ -112,10 +112,15 @@ const PlayerContextProvider = ({children}) => {
     }
 
     useEffect(() => {
-        
+
         if(audioRef.current && seekBar) {
             audioRef.current.ontimeupdate = () => {
-                seekBar.current.style.width = (Math.floor(audioRef.current?.currentTime/audioRef.current?.duration * 100)) + "%";
+
+                const currentTime = !isNaN(audioRef.current?.currentTime) ? audioRef.current?.currentTime : 0;
+                const duration =    !isNaN(audioRef.current?.duration) ? audioRef.current?.duration : 0;
+
+                seekBar.current.style.width = (Math.floor(currentTime/duration * 100)) + "%";
+
                 setTime({
                     currentTime: {
                         seconds: Math.floor(audioRef.current?.currentTime % 60),
